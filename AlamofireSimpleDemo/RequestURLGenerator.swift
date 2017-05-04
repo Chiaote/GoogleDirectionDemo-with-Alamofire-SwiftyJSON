@@ -1,57 +1,54 @@
 //
-//  DirectionParameterSetting.swift
+//  RequestURLGenerator.swift
 //  AlamofireSimpleDemo
 //
 //  Created by 倪僑德 on 2017/5/4.
 //  Copyright © 2017年 Chiao. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
-class directionParameterSetting: NSObject {
+class DirectionParameterSettingAndRequestURLGenerator: NSObject {
     //註記：這邊有點醜, 寫法要再改
-    var origin : String!
-    var destination : String!
+    //參數設定
     var language : languageSetting = .chinese
-    var mod : travelMod = .transit
-    var unit : distanceUnit = .metric
+    var travelMod : travelMod = .transit
+    var distanceUnit : distanceUnit = .metric
     var trafficModel : responceTrafficModel = .pessimistic
-    var transitMode = transitPreferences(bus: true, subway: true, train: true, tram: true, rail: true)
-    var outputFormat : respondsDataType = .json {
-        willSet {
-            urlString = urlStringOutput(outputFormat: newValue.rawValue)
-        }
-    }
-    //    let avoid : avoidPathType = .
+    var transitModePreference = transitPreferences(bus: true, subway: true, train: true, tram: true, rail: true).modeSetting
+    var outputFormat : respondsDataType = .json
     
-    required init(origin:String,destination:String) {
-        super.init()
-        self.origin = origin
-        self.destination = destination
-        self.urlString = urlStringOutput(outputFormat: self.outputFormat.rawValue)
-    }
-    
-    
+    //設定key&呼叫url
     private let mainURL = "https://maps.googleapis.com/maps/api/directions/"
     private let myKey = "AIzaSyAmmbgbhCNuyLVRmWJIftZ1Z9jDD_1zAkU"
     var urlString : String!
     
-    //執行後要回傳一組陣列
-    func produceParameterDictionary() -> [String : Any]{
-        let parameterArray = ["":origin,
-                              "destination":destination,
-                              "language":language,
-                              "mod":mod,
-                              "unit":unit,
-                              "traffic_model":trafficModel,
-                              "transit_mode":transitMode,
-                              /*"avoid":avoid*/
-            "key":myKey] as [String : Any]
-        return parameterArray
+    //產生request的url
+    func produceRequestURL(origin:String,destination:String) -> String {
+        var urlString = "\(mainURL)\(outputFormat)?"
+        let parameters = produceParameterDictionary(origin: origin, destination: destination)
+        for parameter in parameters {
+            if parameter.value as! String != "" {
+                urlString += "\(parameter.key)=\(parameter.value)&"
+                print(urlString)
+            }
+        }
+        urlString += "key=\(myKey)"
+        print(urlString)
+        return urlString
     }
     
-    private func urlStringOutput (outputFormat:String) -> String {
-        return "\(mainURL)\(outputFormat)"
+    //產生一組含有所有參數的陣列
+    private func produceParameterDictionary(origin:String,destination:String) -> [String : Any]{
+        let parameterArray = ["origin":origin,
+                              "destination":destination,
+                              "language":language.rawValue,
+                              "mod":travelMod.rawValue,
+                              "units":distanceUnit.rawValue,
+                              "traffic_model":trafficModel.rawValue,
+                              "transit_mode":transitModePreference!,
+                              /*"avoid":avoid*/] as [String : Any]
+        return parameterArray
     }
 }
 
@@ -97,7 +94,7 @@ class transitPreferences {
     var modeSetting : String!
     
     //creat the settingResultString
-    func produceTransitModeString(modStringArray : [String], modOptionArray:[Bool]) -> String {
+    private func produceTransitModeString(modStringArray : [String], modOptionArray:[Bool]) -> String {
         var modeSettingString = ""
         for i in 0...modStringArray.count-1 {
             if modOptionArray[i] {
@@ -117,8 +114,8 @@ class transitPreferences {
         self.train.0 = train
         self.tram.0 = tram
         self.rail.0 = rail
-        var modeOptionArray = [self.bus.0,self.subway.0,self.train.0,self.tram.0,self.rail.0]
-        var modeStringArray = [self.bus.1,self.subway.1,self.train.1,self.tram.1,self.rail.1]
+        let modeOptionArray = [self.bus.0,self.subway.0,self.train.0,self.tram.0,self.rail.0]
+        let modeStringArray = [self.bus.1,self.subway.1,self.train.1,self.tram.1,self.rail.1]
         modeSetting = produceTransitModeString(modStringArray: modeStringArray, modOptionArray: modeOptionArray)
     }
 }
