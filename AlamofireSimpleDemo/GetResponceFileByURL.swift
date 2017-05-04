@@ -8,8 +8,8 @@
 
 import UIKit
 
-class GetResponceFileByURL: NSObject {
-    
+class GetResponceFileWithJson: NSObject {
+    /*
     
     func getResponce (requestURL:String) {
         
@@ -31,5 +31,5 @@ class GetResponceFileByURL: NSObject {
     }
     
     task.resume()
-    
+    */
 }

@@ -21,10 +21,35 @@ class DirectionParameterSettingAndRequestURLGenerator: NSObject {
     //設定key&呼叫url
     private let mainURL = "https://maps.googleapis.com/maps/api/directions/"
     private let myKey = "AIzaSyAmmbgbhCNuyLVRmWJIftZ1Z9jDD_1zAkU"
-    var urlString : String!
+    private var urlString : String!
     
-    //產生request的url
-    func produceRequestURL(origin:String,destination:String) -> String {
+    //產生一組含有所有參數的陣列, 並將為設定參數的key拿掉
+    func produceParameterDictionary(origin:String,destination:String) -> [String : String]{
+        var parameterArray = ["origin":origin,
+                              "destination":destination,
+                              "language":language.rawValue,
+                              "mod":travelMod.rawValue,
+                              "units":distanceUnit.rawValue,
+                              "traffic_model":trafficModel.rawValue,
+                              "transit_mode":transitModePreference!,
+                              /*"avoid":avoid*/]
+        
+        let tmpArray = parameterArray.filter { $0.key != ""}
+        parameterArray.removeAll()
+        for tmpObj in tmpArray {
+            parameterArray[tmpObj.key] = tmpObj.value
+        }
+        return parameterArray
+    }
+    //產生urlStringIncludingRespondType
+    func urlStringWithRespondType() -> String {
+        urlString = "\(mainURL)\(outputFormat)"
+        return urlString
+    }
+    
+    /*
+     //產生request的url
+    func produceRequestURLString(origin:String,destination:String) -> String {
         var urlString = "\(mainURL)\(outputFormat)?"
         let parameters = produceParameterDictionary(origin: origin, destination: destination)
         for parameter in parameters {
@@ -37,19 +62,8 @@ class DirectionParameterSettingAndRequestURLGenerator: NSObject {
         print(urlString)
         return urlString
     }
-    
-    //產生一組含有所有參數的陣列
-    private func produceParameterDictionary(origin:String,destination:String) -> [String : Any]{
-        let parameterArray = ["origin":origin,
-                              "destination":destination,
-                              "language":language.rawValue,
-                              "mod":travelMod.rawValue,
-                              "units":distanceUnit.rawValue,
-                              "traffic_model":trafficModel.rawValue,
-                              "transit_mode":transitModePreference!,
-                              /*"avoid":avoid*/] as [String : Any]
-        return parameterArray
-    }
+     */
+
 }
 
 //設定回傳資料方式
@@ -61,6 +75,7 @@ enum respondsDataType : String{ //直接寫
 enum languageSetting : String { //&language=
     case chinese = "zh-TW"
     case english = "en"
+    case defaultValue = ""
 }
 //設定旅遊型態
 enum travelMod : String {  //&mod=
@@ -69,18 +84,20 @@ enum travelMod : String {  //&mod=
     case walking = "walking"
     case bike = "bicycling"
     case transit = "transit"
+    case defaultValue = ""
 }
 //設定距離單位
 enum distanceUnit : String { //&units=
     case metric = "metric"
     case imperial = "imperial"
+    case defaultValue = ""
 }
 //設定路線回傳模式
 enum responceTrafficModel : String {
     case bestGuess = "best_guess"   //指出傳回的 duration_in_traffic 應該是考量歷史路況與即時路況下的最佳預估旅行時間。departure_time 越接近現在，即時路況就越重要。
     case pessimistic = "pessimistic" //指出傳回的 duration_in_traffic 應該比過去大部分的實際旅行時間更久，雖然偶有路況特別壅塞而超過此值的日子。
     case optimistic = "optimistic"   //指出傳回的 duration_in_traffic 應該比過去大部分的實際旅行時間更短，雖然偶有路況特別順暢而比此值更快的日子。
-    
+    case defaultValue = ""
 }
 
 //設定偏好大眾運輸模式
