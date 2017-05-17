@@ -10,4 +10,5 @@ target 'AlamofireSimpleDemo' do
   # Pods for AlamofireSimpleDemo
   pod'Alamofire', '~> 4.4.0'
   pod 'AlamofireImage'
+  pod 'SwiftyJSON'
 end
