@@ -10,6 +10,9 @@ import UIKit
 import SwiftyJSON
 
 /* 
+Model主要功能：
+ 1. 將回傳的JSON資料物件化
+ 
 未完成部分：
  1. 大眾運輸 ： transit disctionary下層資料讀取異常
  2. 解析模式切換 - steps內有三種資料結構：

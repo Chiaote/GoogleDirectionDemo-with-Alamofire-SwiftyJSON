@@ -6,30 +6,31 @@
 //  Copyright © 2017年 Chiao. All rights reserved.
 //
 
-import UIKit
-
 /*
-待修正部分：
+ Model主要功能：
+    1. 產生Alamofire需要的parameters dictionary
+ 待修正部分：
     1. transitModePreference部分應改成func直接產生, not產生物件讀取property
 */
 
 
+import UIKit
+
 /// To Produce a parameter dictionary & urlString to Alamofire, you can change the parameters by change the value in this class
 class DirectionParameterSettingAndRequestURLGenerator: NSObject {
     
-    // String setting
-    let departureTimeKeyWords = "departure_time"
+    // String setting.
+    private let departureTimeKeyWords = "departure_time"
     
-    //---------註記：這邊有點醜, 寫法要再改-----------
-    // Parameters setting
+    // Parameters with defaultValue.
     var outputFormat : respondsDataType = .json
     var language : languageSetting = .chinese
     var distanceUnit : distanceUnit = .metric
-    
     var travelMod : travelMod = .transit
-    var transitModePreference = transitPreferences(bus: true, subway: true, train: true, tram: true, rail: true).modeSetting
     
+    // Parameters with transit travelMod.
     var departureTime = "1495004263"
+    var transitModePreference = transitPreferences(bus: true, subway: true, train: true, tram: true, rail: true).modeSetting
     var trafficModel : responceTrafficModel = .pessimistic
     
     
@@ -69,7 +70,6 @@ class DirectionParameterSettingAndRequestURLGenerator: NSObject {
         return parameterArray
     }
     
-    
     /// Combine urlString and response type(json/xml) to produce a requestURL for Alamofire making request
     ///
     /// - Returns: urlString
@@ -78,6 +78,7 @@ class DirectionParameterSettingAndRequestURLGenerator: NSObject {
         return urlString
     }
 }
+
 
 //設定回傳資料方式
 enum respondsDataType : String{ //直接寫
@@ -111,6 +112,14 @@ enum responceTrafficModel : String {
     case pessimistic = "pessimistic" //指出傳回的 duration_in_traffic 應該比過去大部分的實際旅行時間更久，雖然偶有路況特別壅塞而超過此值的日子。
     case optimistic = "optimistic"   //指出傳回的 duration_in_traffic 應該比過去大部分的實際旅行時間更短，雖然偶有路況特別順暢而比此值更快的日子。
     case defaultValue = ""
+}
+//設定要避開的
+enum avoidPathType : String {   //avoid=
+    case tolls = "tolls"    //指出計算的路線應該避開收費道路/橋樑。
+    case highways = "highways"  //指出計算的路線應該避開高速公路。
+    case ferries = "ferries"    //指出計算的路線應該避開渡輪。
+    case indoor = "indoor"  //指出計算的路線應該避開有室內臺階的步行與大眾運輸路線。
+    case none = ""
 }
 
 //設定偏好大眾運輸模式
@@ -161,13 +170,3 @@ class transitPreferences {
         return modeSettingString
     }
 }
-
-//設定要避開的
-enum avoidPathType : String {   //avoid=
-    case tolls = "tolls"    //指出計算的路線應該避開收費道路/橋樑。
-    case highways = "highways"  //指出計算的路線應該避開高速公路。
-    case ferries = "ferries"    //指出計算的路線應該避開渡輪。
-    case indoor = "indoor"  //指出計算的路線應該避開有室內臺階的步行與大眾運輸路線。
-    case none = ""
-}
-
